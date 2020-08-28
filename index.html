@@ -1,0 +1,432 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Stimulus 框架简介</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/beige.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+    <style media="screen">
+      .reveal h1,
+      .reveal h2,
+      .reveal h3 {
+        text-transform: none;
+        font-family: sans-serif;
+      }
+      .reveal section img {
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h2>Stimulus.js</h2>
+          <p>谦虚的 JavaScript 框架</p>
+        </section>
+        <section>
+          <p>“〇〇是未来的趋势。”</p>
+        </section>
+        <section>
+          <p>十年前</p>
+          <ul>
+            <li class="fragment">SOA 会成为主流</li>
+            <li class="fragment">Flash 网站是未来的趋势</li>
+            <li class="fragment">所有网站都会用 Ruby on Rails 重写</li>
+          </ul>
+        </section>
+        <section>
+          <p>今天</p>
+          <ul>
+            <li class="fragment">微服务会成为主流</li>
+            <li class="fragment">前后端分离是未来的趋势</li>
+            <li class="fragment">一切能被 JavaScript 实现的都会被 JavaScript 重写</li>
+          </ul>
+        </section>
+        <section>
+          <h3>rabbit vs turtle</h3>
+          <a href="https://www.youtube.com/watch?v=frm0Hga3lO4" target="_blank">https://www.youtube.com/watch?v=frm0Hga3lO4</a>
+        </section>
+        <section>
+          <img src="image/good-news-everyone-yet-another-javascript-framework-to-learn.jpg" alt="">
+        </section>
+        <section>
+          <img src="image/frameworks.png" alt="" height="600">
+        </section>
+        <section>
+          <h3>Rails Frontend</h3>
+          <ul>
+            <li>2011-08-31 Assets Pipeline</li>
+            <li>2013-06-25 Turbolinks</li>
+            <li>2016-06-30 Turbolinks for Android/iOS</li>
+            <li>2017-04-27 Yarn/Webpacker</li>
+            <li>2018-01-03 Stimulus</li>
+          </ul>
+        </section>
+        <section data-background-image="image/dhh.png">
+        </section>
+        <section>
+          <h3>谦虚的 JavaScript 框架</h3>
+          <ul>
+            <li>不接管整个前端（不处理页面渲染）</li>
+            <li>跟服务端渲染良好协作</li>
+            <li>兼容 Turbolinks</li>
+          </ul>
+        </section>
+        <section>
+          <h3>* 基于 Turbolinks 的跨平台开发</h3>
+          <p>
+            <a href="http://chloerei.com/rubyconfchina2016/">http://chloerei.com/rubyconfchina2016/</a>
+          </p>
+          <p>
+            <a href="https://www.youtube.com/watch?v=fG04hTfiH2c">https://www.youtube.com/watch?v=fG04hTfiH2c</a>
+          </p>
+        </section>
+        <section>
+          <h3>Ruby China</h3>
+          <table>
+            <tbody>
+              <tr>
+                <td><img src="image/turbolinks-timeline.png" alt=""></td>
+                <td><img src="image/no-turbolinks-timeline.png" alt=""></td>
+              </tr>
+              <tr>
+                <td style="text-align: center;">Turbolinks</td>
+                <td style="text-align: center;">No Turbolinks</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <p>Turbolinks 环境下如何写 JavaScript？</p>
+        </section>
+        <section>
+          <pre><code data-trim>
+            $(document).ready(function() {
+              $('#btn').on('click', function() {} );
+            });
+          </code></pre>
+          <p class="fragment">🙅 错误</p>
+        </section>
+        <section>
+          <pre><code data-trim>
+            $(document).on('turbolinks:load', function() {
+              $('#btn').on('click', function() {} );
+            });
+          </code></pre>
+          <p class="fragment">🤦 怪异</p>
+        </section>
+        <section>
+          <pre><code data-trim>
+            $(document).on('click', '#btn', function() {} );
+          </code></pre>
+          <pre><code data-trim>
+            $(document).on('click', '[data-behavior~="btn"]', function() { });
+          </code></pre>
+          <p class="fragment">🙎‍ 还行</p>
+        </section>
+        <section>
+          <h3>Bootstrap</h3>
+          <pre><code data-trim>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+              Launch demo modal
+            </button>
+            <div class="modal fade" id="exampleModal">
+            </div>
+          </code></pre>
+          <p><a href="https://getbootstrap.com/">https://getbootstrap.com/</a></p>
+        </section>
+        <section>
+          <h3>问题</h3>
+          <ul>
+            <li>太多绑定事件的方式。</li>
+            <li>缺乏模块化。</li>
+            <li>太多全局绑定。</li>
+          </ul>
+        </section>
+        <section>
+          <h3>可选方案：Custom Element</h3>
+          <pre><code data-trim>
+            class AppDrawer extends HTMLElement {...}
+            window.customElements.define('app-drawer', AppDrawer);
+          </code></pre>
+          <pre><code data-trim>
+            <app-drawer></app-drawer>
+          </code></pre>
+          <p><a href="https://developers.google.com/web/fundamentals/web-components/customelements">自定义元素 v1：可重用网络组件</a></p>
+        </section>
+        <section data-background-image="image/custom-element.png">
+        </section>
+        <section>
+          <h3>可选方案：MutationObserver</h3>
+          <pre><code data-trim class="javascript">
+            // Create an observer instance linked to the callback function
+            var observer = new MutationObserver(callback);
+
+            // Start observing the target node for configured mutations
+            observer.observe(targetNode, config);
+
+            // Later, you can stop observing
+            observer.disconnect();
+          </code></pre>
+          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver">MDN: MutationObserver</a></p>
+        </section>
+        <section data-background-image="image/mutation-observer.png">
+        </section>
+        <section>
+          <p>Stimulus.js 基于 MutationObserver</p>
+        </section>
+        <section>
+          <h3>解决的问题</h3>
+          <ul>
+            <li>规范化</li>
+            <li>模块化</li>
+            <li>避免全局绑定</li>
+          </ul>
+        </section>
+        <section data-background-image="image/stimulus-hello-world.png">
+        </section>
+        <section>
+          <img src="image/todomvc-com.png" alt="">
+          <a href="http://todomvc.com/">http://todomvc.com/</a>
+        </section>
+        <section>
+          <a href="http://chloerei.com/todomvc-stimulus/" target="_blank">http://chloerei.com/todomvc-stimulus/</a>
+        </section>
+        <section>
+          <img src="image/todomvc-template.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc.png" alt="">
+        </section>
+        <section>
+          <pre><code data-trim>
+$ npm install stimulus
+          </code></pre>
+          <pre><code data-trim>
+(function (window) {
+  'use strict';
+
+  window.application = Stimulus.Application.start()
+
+})(window);
+          </code></pre>
+        </section>
+        <section>
+          <img src="image/todo-mvc.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-1.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-2.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-3.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-4.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-4-1.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-5.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-6.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-7.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-8.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-9.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-10.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-14.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-11.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-12.png" alt="">
+        </section>
+        <section>
+          <img src="image/todo-mvc-13.png" alt="">
+        </section>
+        <section>
+          <table>
+            <tr>
+              <td style="vertical-align: middle;">
+                <img src="image/how-to-draw-a-horse.jpg">
+              </td>
+              <td style="vertical-align: middle;">
+                <h3>Stimulus • TodoMVC</h3>
+                <ul>
+                  <li><a href="http://chloerei.com/todomvc-stimulus/">http://chloerei.com/todomvc-stimulus/</a></li>
+                  <li><a href="https://github.com/chloerei/todomvc-stimulus">https://github.com/chloerei/todomvc-stimulus</a></li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </section>
+        <section>
+          <h3>优点</h3>
+          <ul>
+            <li>与服务端渲染配合良好。</li>
+            <li>HTML 元素和功能的映射很直观。</li>
+            <li>学习门槛低。</li>
+          </ul>
+        </section>
+        <section>
+          <h3>缺点</h3>
+          <ul>
+            <li>需要前端渲染时变得复杂。</li>
+            <li>Controller 之间通信困难。</li>
+            <li>不适合管理大量客户端状态。</li>
+          </ul>
+        </section>
+        <section>
+          <table>
+            <thead>
+              <tr>
+                <th>Framework</th>
+                <th>Code Lines</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td>Vanilla JS</td>
+                <td>948</td>
+              </tr>
+              <tr class="fragment">
+                <td>React</td>
+                <td>493</td>
+              </tr>
+              <tr class="fragment">
+                <td>Angular</td>
+                <td>371</td>
+              </tr>
+              <tr class="fragment">
+                <td>Stimulus</td>
+                <td>240</td>
+              </tr>
+              <tr class="fragment">
+                <td>Vue</td>
+                <td>170</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <table>
+            <thead>
+              <tr>
+                <th>Stimulus</th>
+                <th>Vue</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>服务端渲染</td>
+                <td>客户端渲染</td>
+              </tr>
+              <tr>
+                <td>交互简单</td>
+                <td>交互复杂</td>
+              </tr>
+              <tr>
+                <td>客户端状态少</td>
+                <td>客户端状态多</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <p>哪里可以用上 Stimulus.js</p>
+        </section>
+        <section>
+          <p>Admin & Dashboard</p>
+          <img src="image/beagle.png" alt="">
+        </section>
+        <section>
+          <p>github.com/getcampo/campo</p>
+          <img src="image/campo.png" alt="">
+        </section>
+        <section>
+          <h3>Stimulus 提供一种选择</h3>
+          <ul>
+            <li>不需要一开始就学习一个重型前端框架</li>
+            <li>不需要一开始就将开发人员分成前端后端</li>
+          </ul>
+        </section>
+        <section>
+          <p>Does it scale?</p>
+        </section>
+        <section>
+          <p>“我们的应用跑在一百台服务器上。”</p>
+          <p>“是不是性能不好？”</p>
+        </section>
+        <section>
+          <p>“我们团队有一百个开发人员。”</p>
+          <p>“太棒了，怎么做到的？”</p>
+        </section>
+        <section>
+          <img src="image/bell_curve.png" alt="">
+        </section>
+        <section>
+          <img src="image/bell_curve_2.png" alt="">
+        </section>
+        <section>
+          <img src="image/startup.jpg" alt="" height="600">
+        </section>
+        <section>
+          <p>使用合适的工具做合适的事。</p>
+        </section>
+        <section>
+          <h3>Q & A</h3>
+        </section>
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        history: true,
+        transition: 'fade',
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
+</html>
